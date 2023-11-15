@@ -1,1 +1,149 @@
-<p>main works!</p>
+<div class="w-full flex align-middle justify-between bg-gray-100">
+  <p class="text-gray-600 text-2xl p-3 mr-6">Inventory Listing</p>
+  <div class="flex pt-2">
+    <img class="w-10 h-10 cursor-pointer" src="assets/img/first.png" alt="">
+    <img class="w-10 h-10 cursor-pointer" src="assets/img/previous.png" alt="">
+    <img class="w-10 h-10 cursor-pointer" src="assets/img/next.png" alt="">
+    <img class="w-10 h-10 cursor-pointer" src="assets/img/last.png" alt="">
+  </div>
+  <div class="mt-1">
+    <select id="category" name="category" (change)="filterCategories($event)" class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
+      <option value="All Categories" selected>All Categories</option>
+      <option value="Pumps">Pumps</option>
+      <option value="Heaters">Heaters</option>
+      <option value="Electronics">Electronics</option>
+      <option value="Plumbing">Plumbing</option>
+      <option value="Structure">Structure</option>
+    </select>
+  </div>
+  <div *ngIf="!searching" class="relative my-2 mr-6" data-te-input-wrapper-init>
+    <input
+      (keydown.enter)="searchProducts($event)"
+      type="search"
+      class="peer block min-h-[auto] w-full rounded border-sky-500 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none  [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+      id="productSearch"
+      placeholder="Type query" />
+    <label
+      for="productSearch"
+      class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+      >Search</label
+    >
+  </div>
+  <div *ngIf="searching" class="py-1 px-3 rounded-md m-3 bg-sky-500 cursor-pointer">
+    <p (click)="resetSearch()" class="text-gray-100">Clear Search</p>
+  </div>
+</div>
+<div class="mx-3 bg-sky-500">
+  <table class="w-full">
+    <thead class="bg-sky-500 text-gray-100">
+      <tr>
+        <th class="text-left text-gray-100">SKU</th>
+        <th class="text-left text-gray-100">Description</th>
+        <th class="text-left text-gray-100">Category</th>
+        <th class="text-right text-gray-100">Price</th>
+        <th class="text-right text-gray-100">Quantity</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white">
+      <tr *ngFor="let item of items" class="hover:bg-gray-200 cursor-pointer" (click)="selectItem(item)">
+          <td class="text-gray-600">{{ item.sku }}</td>
+          <td class="text-gray-600">{{ item.description }}</td>
+          <td class="text-gray-600">{{ item.category }}</td>
+          <td class="text-right text-gray-600">{{ item.price | currency }}</td>
+          <td class="text-right text-gray-600">{{ item.quantity }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="bg-black/50 white text fixed left-0 top-32 md:top-0 min-h-full min-w-full md:flex md:justify-center md:items-center" *ngIf="isModalOpen">
+  <div class="bg-gray-200 rounded-lg md:w-3/4 md:mx-auto">
+    <div class="flex">
+      <p class="mx-auto py-2 font-bold text-black text-xl lg:text-2xl">{{ selectedItem.sku }} - {{ selectedItem.description }}</p>
+    </div>
+    <div class="my-5 mx-5 grid grid-cols-2 justify-between">
+      <div>
+        <p class="text-lg font-bold mb-2">Quantities</p>
+        <p *ngFor="let quantity of itemQuantities" class="ml-4"> {{ quantity.location }}: {{quantity.quantity}}</p>
+        <div class="w-full mt-5">
+          <a [routerLink]="['/edit/',selectedItem._id]" class="text-center w-full mt-5 text-sm text-sky-500 border border-sky-500 hover:bg-sky-500 hover:text-gray-100 rounded-lg py-2 px-3 cursor-pointer">
+            Edit Item
+          </a>
+        </div>
+      </div>
+      <div class="text-center">
+        <div (click)="openMoving('Receive')" class="mx-24 text-center text-sm text-sky-500 border border-sky-500 hover:bg-sky-500 hover:text-gray-100 rounded-lg p-1 cursor-pointer">
+          Receive
+        </div>
+        <div (click)="openMoving('Sell')" class=" mt-2 mx-24 text-center text-sm text-green-500 border border-green-500 hover:bg-green-500 hover:text-gray-100 rounded-lg p-1 cursor-pointer">
+          Sell
+        </div>
+        <div (click)="openMoving('Transfer')" class=" mt-2 mx-24 text-center text-sm text-orange-500 border border-orange-500 hover:bg-orange-500 hover:text-gray-100 rounded-lg p-1 cursor-pointer">
+          Transfer
+        </div>
+        <div (click)="openMoving('Adjust')" class=" mt-2 mx-24 text-center text-sm text-red-500 border border-red-500 hover:bg-red-500 hover:text-gray-100 rounded-lg p-1 cursor-pointer">
+          Adjust
+        </div>
+      </div>
+    </div>
+    <div class="w-full grid grid-cols-1 justify-items-center mb-3 mt-8">
+      <div (click)="closeModal()" class="relative w-1/4 text-center text-md text-sky-500 border border-sky-500 hover:bg-sky-500 hover:text-gray-100 rounded-lg p-2 cursor-pointer">
+        Close
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bg-black/50 white text fixed left-0 top-32 md:top-0 min-h-full min-w-full md:flex md:justify-center md:items-center" *ngIf="showMoving">
+  <form [formGroup]="qtyForm" (submit)="processMove()">
+    <div class="bg-gray-200 rounded-lg md:w-full px-10 md:mx-auto">
+      <div class="text-center">
+        <p class="mx-auto py-2 font-bold text-black text-lg lg:text-2xl">{{ moveType }} Item</p>
+        <p class="mx-auto mb-5 font-bold text-sky-500 text-lg lg:text-2xl">{{ selectedItem.sku }} - {{ selectedItem.description }}</p>
+      </div>
+      <div>
+        <p *ngIf="moveType === 'Receive'" class="w-full text-center my-5">Please note all quantities received are received to the main warehouse</p>
+      </div>
+      <div *ngIf="moveType==='Receive' || moveType==='Sell'" class="flex items-baseline ml-12 mt-5">
+        <label for="reference" class="block font-medium leading-6 text-gray-900">Reference</label>
+        <div class="mt-2">
+          <input type="text" formControlName="reference" name="reference" id="reference" class="ml-4 px-2 block w-2/3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        </div>
+      </div>
+      <p *ngIf="referenceError" class="mt-2 ml-12 text-sm text-red-600" id="email-error">Please enter a reference!</p>
+      <div class="flex items-baseline ml-12">
+        <label *ngIf="moveType != 'Receive'" for="location" class="block font-medium leading-6 text-gray-900"><span *ngIf="moveType==='Transfer'">From </span>Location</label>
+        <div *ngIf="moveType != 'Receive'" class="mt-2">
+          <select id="location" name="location" formControlName="fromLocation" class="ml-4 px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            <option value="Shop" selected>Shop</option>
+            <option value="Van">Van</option>
+          </select>
+        </div>
+        <label *ngIf="moveType === 'Transfer'" for="toLocation" class="block font-medium leading-6 text-gray-900 ml-24">To Location</label>
+        <div *ngIf="moveType === 'Transfer'" class="mt-2">
+          <select id="toLocation" name="toLocation" formControlName="toLocation" class="ml-4 px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            <option value="Shop" selected>Shop</option>
+            <option value="Van">Van</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex items-baseline ml-12 mt-5">
+        <label for="quantity" class="block font-medium leading-6 text-gray-900">Quantity to {{ moveType}}</label>
+        <div class="mt-2">
+          <input type="number" formControlName="quantity" name="quantity" id="quantity" class="ml-4 px-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        </div>
+      </div>
+      <p *ngIf="quantityError" class="mt-2 ml-12 text-sm text-red-600" id="email-error">Please enter a valid quantity!</p>
+    <div class="flex">
+      <div class="w-full grid grid-cols-1 justify-items-center mb-3 mt-8">
+        <div (click)="closeMoving()" class="relative w-1/2 text-center text-md text-sky-500 border border-sky-500 hover:bg-sky-500 hover:text-gray-100 rounded-lg p-2 cursor-pointer">
+          Close
+        </div>
+      </div>
+      <button type="submit" class="w-full grid grid-cols-1 justify-items-center mb-3 mt-8">
+        <div class="relative w-1/2 text-center text-md text-sky-500 border border-sky-500 hover:bg-sky-500 hover:text-gray-100 rounded-lg p-2 cursor-pointer">
+          Process
+        </div>
+      </button>
+    </div>
+    </div>
+  </form>
+</div>

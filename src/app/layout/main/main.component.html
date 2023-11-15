@@ -102,10 +102,10 @@
       <div>
         <p *ngIf="moveType === 'Receive'" class="w-full text-center my-5">Please note all quantities received are received to the main warehouse</p>
       </div>
-      <div *ngIf="moveType==='Receive' || moveType==='Sell'" class="flex items-baseline ml-12 mt-5">
+      <div *ngIf="moveType==='Receive' || moveType==='Sell' || moveType==='Adjust'" class="flex items-baseline ml-12 mt-5">
         <label for="reference" class="block font-medium leading-6 text-gray-900">Reference</label>
         <div class="mt-2">
-          <input type="text" formControlName="reference" name="reference" id="reference" class="ml-4 px-2 block w-2/3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          <input type="text" formControlName="reference" name="reference" id="reference" class="ml-4 px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
         </div>
       </div>
       <p *ngIf="referenceError" class="mt-2 ml-12 text-sm text-red-600" id="email-error">Please enter a reference!</p>

@@ -82,6 +82,7 @@ export class MainComponent implements OnInit {
       this.quantityError = true;
       return;
     }
+
     switch (this.moveType) {
       case 'Receive':
         if (this.qtyForm.value.reference === '') {
@@ -98,6 +99,10 @@ export class MainComponent implements OnInit {
         });
         break;
       case 'Sell':
+        if (this.qtyForm.value.reference === '') {
+          this.referenceError = true;
+          return;
+        }
         this.selectedQuantityRecord = this.itemQuantities.find((quantity: Quantity) => {
           return quantity.location === this.qtyForm.value.fromLocation;
         })!;
@@ -120,6 +125,10 @@ export class MainComponent implements OnInit {
         this.itemService.updateQuantity(this.transferToQuantityRecord._id!, this.transferToQuantityRecord.quantity);
         break;
       case 'Adjust':
+        if (this.qtyForm.value.reference === '') {
+          this.referenceError = true;
+          return;
+        }
         this.selectedQuantityRecord = this.itemQuantities.find((quantity: Quantity) => {
           return quantity.location === this.qtyForm.value.fromLocation;
         })!;

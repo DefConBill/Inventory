@@ -1,1 +1,134 @@
-<p>sell works!</p>
+<div class="w-full flex align-middle justify-between bg-gray-100">
+  <p class="text-gray-600 text-2xl p-3 mr-6">Sell Inventory</p>
+</div>
+<div *ngIf="showSuccess" class="rounded-md bg-green-50 p-4 mb-1">
+  <div class="flex">
+    <div class="flex-shrink-0">
+      <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+      </svg>
+    </div>
+    <div class="ml-3 grid grid-cols-2 align-top w-full justify-between">
+      <h3 class="text-sm font-medium text-green-800">Sale Added Successfully</h3>
+        <div class="-mx-2 -my-1.5 text-right">
+          <button type="button" (click)="dismissAlert()" class="ml-3 rounded-md bg-green-50 px-2 py-1.5 text-sm font-medium text-green-800 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:ring-offset-green-50">Dismiss</button>
+        </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="showFailure" class="rounded-md bg-red-50 p-4 mb-5">
+  <div class="flex">
+    <div class="flex-shrink-0">
+      <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+      </svg>
+    </div>
+    <div class="ml-3 grid grid-cols-2 align-top w-full justify-between">
+      <h3 class="text-sm font-medium text-red-800">There was an error communicating with the server. Please try again!</h3>
+        <div class="-mx-2 -my-1.5 text-right">
+          <button type="button" (click)="dismissAlert()" class="ml-3 rounded-md bg-red-50 px-2 py-1.5 text-sm font-medium text-red-800 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-red-50">Dismiss</button>
+        </div>
+    </div>
+  </div>
+</div>
+<div class="mx-10 my-5 w-full grid grid-cols-2 justify-items-center">
+  <div class="w-full">
+    <label for="refNumber" class="block font-medium leading-6 text-gray-900">Invoice Number</label>
+    <div class="mt-3">
+      <input type="text" name="refNumber" id="refNumber" [(ngModel)]="refNumber" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6">
+    </div>
+    <p *ngIf="refError" class="mt-1 text-sm text-red-600" id="sku-error">You must enter an invoice number</p>
+  </div>
+  <div class="w-1/2 mt-5">
+    <div class="w-full">
+      <div (click)="showAddBlock()" class="text-center mt-4 text-sm text-sky-500 border border-sky-500 hover:bg-sky-500 hover:text-gray-100 rounded-lg pt-2 pb-2 pl-2 pr-2 cursor-pointer">
+        Add Line Item
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mt-1 w-1/2 mx-10">
+  <select id="location" name="location" [(ngModel)]="location" class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
+    <option value="Select Location" selected disabled>Select Location</option>
+    <option value="Shop">Shop</option>
+    <option value="Van">Van</option>
+  </select>
+</div>
+<p *ngIf="locationError" class="mx-10 mt-1 text-sm text-red-600" id="sku-error">You must select a location</p>
+<div class="mx-10 mt-10 bg-sky-500">
+  <table class="w-full">
+    <thead class="bg-sky-500 text-gray-100">
+      <tr>
+        <th class="text-left text-gray-100">SKU</th>
+        <th class="text-left text-gray-100">Description</th>
+        <th class="text-right text-gray-100">Quantity Sold</th>
+        <th class="text-right text-gray-100">Price Each</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white">
+      <tr *ngFor="let lineItem of listItems">
+          <td class="text-gray-600">{{ lineItem.sku }}</td>
+          <td class="text-gray-600">{{ lineItem.description }}</td>
+          <td class="text-right text-gray-600">{{ lineItem.quantity }}</td>
+          <td class="text-right text-gray-600">{{ lineItem.price | currency }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div *ngIf="addingItem" class="mx-10 mt-5 p-3 border border-black rounded-lg">
+  <p class="text-sky-500 text-lg font-bold">Add Line Item</p>
+  <div class="mt-3">
+    <label for="item" class="block text-sm font-medium leading-6 text-gray-900">Find Item</label>
+    <div class="flex gap-5 mt-1 w-1/2">
+      <input (keydown.enter)="findItem($event)" [(ngModel)]="searchText" type="item" name="item" id="item" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+    </div>
+  </div>
+  <table class="w-full mt-3">
+    <tbody class="bg-white">
+      <tr *ngFor="let item of searchedItems" class="hover:bg-gray-200 cursor-pointer" (click)="selectItem(item)">
+          <td class="text-gray-600">{{ item.sku }}</td>
+          <td class="text-gray-600">{{ item.description }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <form *ngIf="showAddItem" [formGroup]="itemForm" (submit)="addItem()">
+    <div class="grid grid-cols-6 gap-3 mt-3">
+      <div>
+        <label for="sku" class="block text-sm font-medium leading-6 text-gray-900">SKU</label>
+        <div class="flex gap-5 mt-1 w-full">
+          <input type="text" [value]="addingSKU" disabled name="sku" id="sku" class="disabled block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        </div>
+      </div>
+      <div class="col-span-3">
+        <label for="description" class="block text-sm font-medium leading-6 text-gray-900">Description</label>
+        <div class="flex gap-5 mt-1 w-full">
+          <input type="text" [value]="addingDescription" disabled name="description" id="description" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        </div>
+      </div>
+      <div>
+        <label for="quantity" class="block text-right text-sm font-medium leading-6 text-gray-900">Quantity</label>
+        <div class="flex gap-5 mt-1 w-full">
+          <input type="number" formControlName="quantity" name="quantity" id="quantity" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        </div>
+      </div>
+      <div>
+        <label for="cost" class="block text-right text-sm font-medium leading-6 text-gray-900">Price Each</label>
+        <div class="flex gap-5 mt-1 w-full">
+          <input type="number" formControlName="cost" name="cost" id="cost" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        </div>
+      </div>
+    </div>
+    <div class="w-full text-right mt-5">
+      <button class="text-center text-sm text-sky-500 border border-sky-500 hover:bg-sky-500 hover:text-gray-100 rounded-lg pt-2 pb-2 pl-2 pr-2 cursor-pointer">
+        Add to Invoice
+      </button>
+    </div>
+  </form>
+</div>
+<div *ngIf="showButton" class="px-10">
+  <div class="w-full text-right mt-5">
+    <button (click)="processInvoice()" class="text-center text-sky-500 border border-sky-500 hover:bg-sky-500 hover:text-gray-100 rounded-lg pt-2 pb-2 pl-2 pr-2 cursor-pointer">
+      Process Invoice
+    </button>
+  </div>
+</div>

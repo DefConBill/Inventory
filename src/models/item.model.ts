@@ -18,3 +18,13 @@ export class Item {
     public _id?: string
   ) { }
 }
+
+export class Move {
+  constructor(
+    public sku: string,
+    public description: string,
+    public quantity: number,
+    public price: string,
+    public itemId: string
+  ) { }
+}

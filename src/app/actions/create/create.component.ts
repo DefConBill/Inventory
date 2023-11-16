@@ -16,6 +16,7 @@ export class CreateComponent implements OnInit {
   priceError: boolean = false;
   showSuccess: boolean = false;
   showFailure: boolean = false;
+  showDuplicate: boolean = false;
 
   itemForm = this.fb.group({
     sku: ['', [Validators.required]],
@@ -31,48 +32,61 @@ export class CreateComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.itemForm.value);
-    this.clearErrors();
-    if (this.itemForm.value.sku == '') {
-      this.skuError = true;
-      return;
-    }
-    if (this.itemForm.value.category == '') {
-      this.categoryError = true;
-      return;
-    }
-    if (this.itemForm.value.description == '') {
-      this.descriptionError = true;
-      return;
-    }
-    if (Number(this.itemForm.value.cost) == 0) {
-      this.costError = true;
-      return;
-    }
-    if (Number(this.itemForm.value.price) == 0) {
-      this.priceError = true;
-      return;
-    }
-    const item: Item = {
-      sku: this.itemForm.value.sku,
-      description: this.itemForm.value.description,
-      category: this.itemForm.value.category,
-      cost: this.itemForm.value.cost,
-      price: this.itemForm.value.price,
-      quantity: 0
-    }
-    this.itemService.addItem(item)
-      .subscribe({
-        next: (result: any) => {
-          this.showSuccess = true;
-          this.showFailure = false;
-          this.itemForm.reset();
-        },
-        error: (err: any) => {
-          this.showSuccess = false;
-          this.showFailure = true;
-        }
-      })
+    //check to see if sku exists
+    this.itemService.getItems().subscribe(results => {
+      const items = results.data;
+      const found = items.find((item: Item) => {
+        return item.sku === this.itemForm.value.sku;
+      });
+      if (found) {
+        this.showDuplicate = true;
+        return;
+      }
+      this.clearErrors();
+      if (this.itemForm.value.sku == '') {
+        this.skuError = true;
+        return;
+      }
+      if (this.itemForm.value.category == '') {
+        this.categoryError = true;
+        return;
+      }
+      if (this.itemForm.value.description == '') {
+        this.descriptionError = true;
+        return;
+      }
+      if (Number(this.itemForm.value.cost) == 0) {
+        this.costError = true;
+        return;
+      }
+      if (Number(this.itemForm.value.price) == 0) {
+        this.priceError = true;
+        return;
+      }
+      const item: Item = {
+        sku: this.itemForm.value.sku,
+        description: this.itemForm.value.description,
+        category: this.itemForm.value.category,
+        cost: this.itemForm.value.cost,
+        price: this.itemForm.value.price,
+        quantity: 0
+      }
+      this.itemService.addItem(item)
+        .subscribe({
+          next: (result: any) => {
+            this.showSuccess = true;
+            this.showFailure = false;
+            this.showDuplicate = false;
+            this.itemForm.reset();
+          },
+          error: (err: any) => {
+            this.showSuccess = false;
+            this.showFailure = true;
+          }
+        })
+
+    });
+
   }
 
   clearErrors() {

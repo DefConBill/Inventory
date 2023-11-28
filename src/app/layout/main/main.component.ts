@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Item, Quantity } from 'src/models/item.model';
+import { Movement } from 'src/models/movement.model';
 import { ItemsService } from 'src/services/items.service';
 import { Input, initTE } from "tw-elements";
 
@@ -97,6 +98,14 @@ export class MainComponent implements OnInit {
         this.itemService.updateItemQuantity(this.selectedItem._id!, this.selectedItem.quantity! + qty).subscribe(result => {
           window.location.reload();
         });
+        const receiptMovement: Movement = {
+          type: 'Receipt',
+          reference: this.qtyForm.value.reference,
+          location: 'Shop',
+          quantity: qty,
+          item: this.selectedItem._id!,
+        }
+        this.itemService.addMovement(receiptMovement);
         break;
       case 'Sell':
         if (this.qtyForm.value.reference === '') {
@@ -111,6 +120,14 @@ export class MainComponent implements OnInit {
         this.itemService.updateItemQuantity(this.selectedItem._id!, this.selectedItem.quantity! - qty).subscribe(result => {
           window.location.reload();
         });
+        const saleMovement: Movement = {
+          type: 'Sale',
+          reference: this.qtyForm.value.reference,
+          location: this.qtyForm.value.fromLocation,
+          quantity: qty,
+          item: this.selectedItem._id!,
+        }
+        this.itemService.addMovement(saleMovement);
         break;
       case 'Transfer':
         this.selectedQuantityRecord = this.itemQuantities.find((quantity: Quantity) => {
@@ -123,6 +140,22 @@ export class MainComponent implements OnInit {
         })!;
         this.transferToQuantityRecord.quantity += qty;
         this.itemService.updateQuantity(this.transferToQuantityRecord._id!, this.transferToQuantityRecord.quantity);
+        const fromMovement: Movement = {
+          type: 'Transfer',
+          reference: 'Transfer Out',
+          location: this.qtyForm.value.fromLocation,
+          quantity: 0 - qty,
+          item: this.selectedItem._id!,
+        }
+        this.itemService.addMovement(fromMovement);
+        const toMovement: Movement = {
+          type: 'Transfer',
+          reference: 'Transfer In',
+          location: this.qtyForm.value.toLocation,
+          quantity: qty,
+          item: this.selectedItem._id!,
+        }
+        this.itemService.addMovement(toMovement);
         break;
       case 'Adjust':
         if (this.qtyForm.value.reference === '') {
@@ -137,6 +170,14 @@ export class MainComponent implements OnInit {
         this.itemService.updateItemQuantity(this.selectedItem._id!, this.selectedItem.quantity! + qty).subscribe(result => {
           window.location.reload();
         });
+        const adjustMovement: Movement = {
+          type: 'Adjustment',
+          reference: this.qtyForm.value.reference,
+          location: this.qtyForm.value.fromLocation,
+          quantity: qty,
+          item: this.selectedItem._id!,
+        }
+        this.itemService.addMovement(adjustMovement);
         break;
     }
 

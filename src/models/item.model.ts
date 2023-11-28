@@ -24,7 +24,8 @@ export class Move {
     public sku: string,
     public description: string,
     public quantity: number,
-    public price: string,
-    public itemId: string
+    public price: number,
+    public itemId: string,
+    public warranty?: boolean
   ) { }
 }

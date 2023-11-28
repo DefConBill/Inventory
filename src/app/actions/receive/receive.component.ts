@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Item, Move } from 'src/models/item.model';
+import { Movement } from 'src/models/movement.model';
 import { ItemsService } from 'src/services/items.service';
 
 @Component({
@@ -16,6 +17,8 @@ export class ReceiveComponent implements OnInit {
   refNumber: string = '';
   addingSKU: string = '';
   addingDescription: string = '';
+  addingCost: number = 0;
+  addingQuantity: number = 0;
   addingId: string = '';
   showAddItem: boolean = false;
   addingItem: boolean = false;
@@ -57,6 +60,7 @@ export class ReceiveComponent implements OnInit {
   selectItem(item: Item) {
     this.addingSKU = item.sku;
     this.addingDescription = item.description;
+    this.addingCost = item.cost;
     this.addingId = item._id ?? '';
     this.searchedItems = [];
     this.searchedItems = [];
@@ -65,7 +69,7 @@ export class ReceiveComponent implements OnInit {
   }
 
   addItem() {
-    const itemToAdd = new Move(this.addingSKU, this.addingDescription, this.itemForm.value.quantity, this.itemForm.value.cost, this.addingId);
+    const itemToAdd = new Move(this.addingSKU, this.addingDescription, this.addingQuantity, this.addingCost, this.addingId);
     this.listItems.push(itemToAdd);
     this.showAddItem = false;
     this.showButton = true;
@@ -94,6 +98,17 @@ export class ReceiveComponent implements OnInit {
               this.showSuccess = true;
             });
           }
+          //update the item costs
+          const newCost = item.price;
+          this.itemService.updateCost(item.itemId!, newCost).subscribe();
+          const movement: Movement = {
+            type: 'Receipt',
+            reference: this.refNumber,
+            location: "Shop",
+            quantity: item.quantity,
+            item: item.itemId!,
+          }
+          this.itemService.addMovement(movement);
         } else {
           this.showFailure = true;
         }

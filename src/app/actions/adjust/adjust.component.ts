@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Item, Move } from 'src/models/item.model';
+import { Movement } from 'src/models/movement.model';
 import { ItemsService } from 'src/services/items.service';
 
 @Component({
@@ -82,25 +83,36 @@ export class AdjustComponent implements OnInit {
 
   processAdjustment() {
     this.listItems.forEach((item: Move) => {
+      let itemLocation = this.location
+      let adjustQuantity = item.quantity
+      let reason = this.refNumber
       this.itemService.getQuantity(item.itemId!).subscribe(results => {
         const quantityRecords = results.data;
         const quantityRecord = quantityRecords.find((record: any) => {
-          return record.location === this.location;
+          return record.location === itemLocation;
         });
-        const newQuantity = quantityRecord!.quantity + item.quantity;
+        const newQuantity = quantityRecord!.quantity + adjustQuantity;
         if (quantityRecord) {
-          quantityRecord.quantity = quantityRecord.quantity + item.quantity;
+          quantityRecord.quantity = quantityRecord.quantity + adjustQuantity;
           if (quantityRecord._id) {
             this.itemService.updateQuantity(quantityRecord._id, newQuantity)
             this.itemService.getItem(item.itemId!).subscribe(results => {
               const itemToUpdate = results.data;
-              const newItemQuantity = itemToUpdate.quantity + item.quantity;
+              const newItemQuantity = itemToUpdate.quantity + adjustQuantity;
               this.itemService.updateItemQuantity(item.itemId!, newItemQuantity).subscribe();
               this.listItems = [];
               this.refNumber = '';
               this.showButton = false;
               this.showSuccess = true;
             });
+            const movement: Movement = {
+              type: 'Adjustment',
+              reference: reason,
+              location: itemLocation,
+              quantity: adjustQuantity,
+              item: item.itemId!,
+            }
+            this.itemService.addMovement(movement);
           }
         } else {
           this.showFailure = true;

@@ -10,8 +10,8 @@ export class ItemsService {
 
   constructor(private http: HttpClient) { }
 
-  getItems() {
-    return this.http.get<{ success: boolean, count: number, pagination: any, data: Item[] }>('https://api.hottubuniverse.ca/api/v1/items')
+  getItems(page: number, limit: number) {
+    return this.http.get<{ success: boolean, count: number, pagination: any, data: Item[] }>(`https://api.hottubuniverse.ca/api/v1/items?page=${page}&limit=${limit}`)
   }
 
   getItem(id: string) {

@@ -17,6 +17,8 @@ export class MainComponent implements OnInit {
   quantityError: boolean = false;
   referenceError: boolean = false;
   moveType: string = '';
+  currentPage: number = 1;
+  lastPageNumber: number = 1;
   items: Item[] = [];
   selectedItem!: Item
   itemQuantities: Quantity[] = [];
@@ -38,13 +40,41 @@ export class MainComponent implements OnInit {
   }
 
   loadItems() {
-    this.itemService.getItems().subscribe(results => {
+    this.itemService.getItems(1, 20).subscribe(results => {
+      this.items = results.data;
+      console.log(results.pagination.next.total);
+      this.lastPageNumber = Math.ceil(results.pagination.next.total / 20);
+      console.log(this.lastPageNumber);
+    })
+  }
+
+  firstPage() {
+    this.loadItems();
+  }
+
+  nextPage() {
+    this.currentPage++;
+    this.itemService.getItems(this.currentPage, 20).subscribe(results => {
+      this.items = results.data;
+    })
+  }
+
+  previousPage() {
+    this.currentPage--;
+    this.itemService.getItems(this.currentPage, 20).subscribe(results => {
+      this.items = results.data;
+    })
+  }
+
+  lastPage() {
+    this.currentPage = this.lastPageNumber;
+    this.itemService.getItems(this.lastPageNumber, 20).subscribe(results => {
       this.items = results.data;
     })
   }
 
   filterCategories(event: any) {
-    this.itemService.getItems().subscribe(results => {
+    this.itemService.getItems(1, 20).subscribe(results => {
       this.items = results.data;
       if (event.target.value === 'All Categories') {
         return

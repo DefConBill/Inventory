@@ -37,7 +37,7 @@ export class TransferComponent implements OnInit {
   constructor(private fb: FormBuilder, private itemService: ItemsService) { }
 
   ngOnInit(): void {
-    this.itemService.getItems().subscribe(results => {
+    this.itemService.getItems(1, 10000).subscribe(results => {
       this.items = results.data;
     })
   }

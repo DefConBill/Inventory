@@ -33,7 +33,7 @@ export class CreateComponent implements OnInit {
 
   onSubmit() {
     //check to see if sku exists
-    this.itemService.getItems().subscribe(results => {
+    this.itemService.getItems(1, 10000).subscribe(results => {
       const items = results.data;
       const found = items.find((item: Item) => {
         return item.sku === this.itemForm.value.sku;

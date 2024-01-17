@@ -1,16 +1,17 @@
 <div class="w-full flex align-middle justify-between bg-gray-100">
-  <p class="text-gray-600 text-2xl p-3 mr-6">Inventory Listing</p>
+  <p class="text-gray-600 text-xl p-3 mr-6">Inventory Listing - Page {{ currentPage}}</p>
   <div class="flex pt-2">
-    <img class="w-10 h-10 cursor-pointer" src="assets/img/first.png" alt="">
-    <img class="w-10 h-10 cursor-pointer" src="assets/img/previous.png" alt="">
-    <img class="w-10 h-10 cursor-pointer" src="assets/img/next.png" alt="">
-    <img class="w-10 h-10 cursor-pointer" src="assets/img/last.png" alt="">
+    <img class="w-10 h-10 cursor-pointer" src="assets/img/first.png" alt="" (click)="firstPage()">
+    <img class="w-10 h-10 cursor-pointer" src="assets/img/previous.png" alt="" (click)="previousPage()">
+    <img class="w-10 h-10 cursor-pointer" src="assets/img/next.png" alt="" (click)="nextPage()">
+    <img class="w-10 h-10 cursor-pointer" src="assets/img/last.png" alt="" (click)="lastPage()">
   </div>
   <div class="mt-1">
     <select id="category" name="category" (change)="filterCategories($event)" class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
       <option value="All Categories" selected>All Categories</option>
-      <option value="Pumps">Pumps</option>
-      <option value="Heaters">Heaters</option>
+      <option value="Pump">Pumps</option>
+      <option value="Pack">Packs</option>
+      <option value="Heater">Heaters</option>
       <option value="Electronics">Electronics</option>
       <option value="Plumbing">Plumbing</option>
       <option value="Structure">Structure</option>

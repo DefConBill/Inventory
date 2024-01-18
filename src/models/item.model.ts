@@ -15,7 +15,8 @@ export class Item {
     public cost: number,
     public price: number,
     public quantity: number,
-    public _id?: string
+    public _id?: string,
+    public quantities?: Quantity[]
   ) { }
 }
 

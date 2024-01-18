@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Item, Quantity } from 'src/models/item.model';
 import { Movement } from 'src/models/movement.model';
+import { AuthService } from 'src/services/auth.service';
 import { ItemsService } from 'src/services/items.service';
 import { Input, initTE } from "tw-elements";
 
@@ -12,6 +13,7 @@ import { Input, initTE } from "tw-elements";
 })
 export class MainComponent implements OnInit {
   searching: boolean = false;
+  searchText: string = '';
   isModalOpen: boolean = false;
   showMoving: boolean = false;
   quantityError: boolean = false;
@@ -24,6 +26,7 @@ export class MainComponent implements OnInit {
   itemQuantities: Quantity[] = [];
   selectedQuantityRecord!: Quantity;
   transferToQuantityRecord!: Quantity;
+  user: string = '';
 
   qtyForm = this.fb.group({
     fromLocation: ['Shop', [Validators.required]],
@@ -32,15 +35,16 @@ export class MainComponent implements OnInit {
     reference: ['', [Validators.required]]
   });
 
-  constructor(private itemService: ItemsService, private fb: FormBuilder) { }
+  constructor(private itemService: ItemsService, private fb: FormBuilder, private auth: AuthService) { }
 
   ngOnInit(): void {
     initTE({ Input });
     this.loadItems();
+    this.user = this.auth.getFullName();
   }
 
   loadItems() {
-    this.itemService.getItems(1, 20).subscribe(results => {
+    this.itemService.getItems(1, 20, this.searchText).subscribe(results => {
       this.items = results.data;
       console.log(results.pagination.next.total);
       this.lastPageNumber = Math.ceil(results.pagination.next.total / 20);
@@ -49,26 +53,27 @@ export class MainComponent implements OnInit {
   }
 
   firstPage() {
+    this.currentPage = 1;
     this.loadItems();
   }
 
   nextPage() {
     this.currentPage++;
-    this.itemService.getItems(this.currentPage, 20).subscribe(results => {
+    this.itemService.getItems(this.currentPage, 20, this.searchText).subscribe(results => {
       this.items = results.data;
     })
   }
 
   previousPage() {
     this.currentPage--;
-    this.itemService.getItems(this.currentPage, 20).subscribe(results => {
+    this.itemService.getItems(this.currentPage, 20, this.searchText).subscribe(results => {
       this.items = results.data;
     })
   }
 
   lastPage() {
     this.currentPage = this.lastPageNumber;
-    this.itemService.getItems(this.lastPageNumber, 20).subscribe(results => {
+    this.itemService.getItems(this.lastPageNumber, 20, this.searchText).subscribe(results => {
       this.items = results.data;
     })
   }
@@ -86,11 +91,12 @@ export class MainComponent implements OnInit {
   }
 
   searchProducts(event: any) {
+    this.searchText = event.target.value;
     this.searching = true;
-    this.items = this.items.filter((item: Item) => {
-      return item.description.toLowerCase().includes(event.target.value.toLowerCase());
-    });
-    console.log(event.target.value);
+    this.itemService.getItems(1, 20, this.searchText).subscribe(results => {
+      this.items = results.data;
+      this.lastPageNumber = Math.ceil(results.pagination.next.total / 20);
+    })
   }
 
   selectItem(item: Item) {
@@ -129,6 +135,7 @@ export class MainComponent implements OnInit {
           window.location.reload();
         });
         const receiptMovement: Movement = {
+          user: this.user,
           type: 'Receipt',
           reference: this.qtyForm.value.reference,
           location: 'Shop',
@@ -151,6 +158,7 @@ export class MainComponent implements OnInit {
           window.location.reload();
         });
         const saleMovement: Movement = {
+          user: this.user,
           type: 'Sale',
           reference: this.qtyForm.value.reference,
           location: this.qtyForm.value.fromLocation,
@@ -171,6 +179,7 @@ export class MainComponent implements OnInit {
         this.transferToQuantityRecord.quantity += qty;
         this.itemService.updateQuantity(this.transferToQuantityRecord._id!, this.transferToQuantityRecord.quantity);
         const fromMovement: Movement = {
+          user: this.user,
           type: 'Transfer',
           reference: 'Transfer Out',
           location: this.qtyForm.value.fromLocation,
@@ -179,6 +188,7 @@ export class MainComponent implements OnInit {
         }
         this.itemService.addMovement(fromMovement);
         const toMovement: Movement = {
+          user: this.user,
           type: 'Transfer',
           reference: 'Transfer In',
           location: this.qtyForm.value.toLocation,
@@ -201,6 +211,7 @@ export class MainComponent implements OnInit {
           window.location.reload();
         });
         const adjustMovement: Movement = {
+          user: this.user,
           type: 'Adjustment',
           reference: this.qtyForm.value.reference,
           location: this.qtyForm.value.fromLocation,
@@ -216,8 +227,9 @@ export class MainComponent implements OnInit {
   }
 
   resetSearch() {
-    this.loadItems();
     this.searching = false;
+    this.searchText = '';
+    this.loadItems();
   }
 
   closeModal() {

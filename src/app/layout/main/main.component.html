@@ -6,7 +6,7 @@
     <img class="w-10 h-10 cursor-pointer" src="assets/img/next.png" alt="" (click)="nextPage()">
     <img class="w-10 h-10 cursor-pointer" src="assets/img/last.png" alt="" (click)="lastPage()">
   </div>
-  <div class="mt-1">
+  <!-- <div class="mt-1">
     <select id="category" name="category" (change)="filterCategories($event)" class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
       <option value="All Categories" selected>All Categories</option>
       <option value="Pump">Pumps</option>
@@ -16,7 +16,7 @@
       <option value="Plumbing">Plumbing</option>
       <option value="Structure">Structure</option>
     </select>
-  </div>
+  </div> -->
   <div *ngIf="!searching" class="relative my-2 mr-6" data-te-input-wrapper-init>
     <input
       (keydown.enter)="searchProducts($event)"

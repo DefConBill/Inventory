@@ -10,8 +10,13 @@ export class ItemsService {
 
   constructor(private http: HttpClient) { }
 
-  getItems(page: number, limit: number) {
-    return this.http.get<{ success: boolean, count: number, pagination: any, data: Item[] }>(`https://api.hottubuniverse.ca/api/v1/items?page=${page}&limit=${limit}`)
+  getItems(page: number, limit: number, search?: string) {
+    if (!search) {
+      search = '';
+    }
+    const url = `https://api.hottubuniverse.ca/api/v1/items?page=${page}&limit=${limit}&search=${search}`
+    console.log(url);
+    return this.http.get<{ success: boolean, count: number, pagination: any, data: Item[] }>(`https://api.hottubuniverse.ca/api/v1/items?page=${page}&limit=${limit}&search=${search}`)
   }
 
   getItem(id: string) {
@@ -60,6 +65,5 @@ export class ItemsService {
 
   addMovement(movement: Movement) {
     return this.http.post<{ success: boolean, data: any }>(`https://api.hottubuniverse.ca/api/v1/items/${movement.item}/movements`, movement).subscribe();
-
   }
 }

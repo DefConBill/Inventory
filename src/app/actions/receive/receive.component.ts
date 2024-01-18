@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Item, Move } from 'src/models/item.model';
 import { Movement } from 'src/models/movement.model';
+import { AuthService } from 'src/services/auth.service';
 import { ItemsService } from 'src/services/items.service';
 
 @Component({
@@ -27,18 +28,21 @@ export class ReceiveComponent implements OnInit {
   searchText: string = '';
   showSuccess: boolean = false;
   showFailure: boolean = false;
+  user: string = '';
 
   itemForm = this.fb.group({
     quantity: ['', [Validators.required]],
     cost: ['', [Validators.required]]
   });
 
-  constructor(private fb: FormBuilder, private itemService: ItemsService) { }
+  constructor(private fb: FormBuilder, private itemService: ItemsService, private auth: AuthService) { }
 
   ngOnInit(): void {
     this.itemService.getItems(1, 10000).subscribe(results => {
       this.items = results.data;
-    })
+    });
+    this.user = this.auth.getFullName();
+    console.log(this.items)
   }
 
   showAddBlock() {
@@ -102,6 +106,7 @@ export class ReceiveComponent implements OnInit {
           const newCost = item.price;
           this.itemService.updateCost(item.itemId!, newCost).subscribe();
           const movement: Movement = {
+            user: this.user,
             type: 'Receipt',
             reference: this.refNumber,
             location: "Shop",

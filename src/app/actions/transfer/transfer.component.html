@@ -86,9 +86,11 @@
   </div>
   <table class="w-full mt-3">
     <tbody class="bg-white">
+      <tr *ngIf="showItemHeader"><td><td><td>Shop</td><td>Van</td></tr>
       <tr *ngFor="let item of searchedItems" class="hover:bg-gray-200 cursor-pointer" (click)="selectItem(item)">
           <td class="text-gray-600">{{ item.sku }}</td>
           <td class="text-gray-600">{{ item.description }}</td>
+          <td *ngFor="let quantity of item.quantities">{{ quantity.quantity}}</td>
       </tr>
     </tbody>
   </table>

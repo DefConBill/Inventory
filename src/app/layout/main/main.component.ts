@@ -93,6 +93,7 @@ export class MainComponent implements OnInit {
   searchProducts(event: any) {
     this.searchText = event.target.value;
     this.searching = true;
+    this.currentPage = 1;
     this.itemService.getItems(1, 20, this.searchText).subscribe(results => {
       this.items = results.data;
       this.lastPageNumber = Math.ceil(results.pagination.next.total / 20);
@@ -229,6 +230,7 @@ export class MainComponent implements OnInit {
   resetSearch() {
     this.searching = false;
     this.searchText = '';
+    this.currentPage = 1;
     this.loadItems();
   }
 

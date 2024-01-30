@@ -57,7 +57,7 @@ export class ReceiveComponent implements OnInit {
   findItem(event: any) {
     this.showAddItem = false;
     this.searchedItems = this.items.filter((item: Item) => {
-      return item.description.toLowerCase().includes(event.target.value.toLowerCase());
+      return item.description.toLowerCase().includes(event.target.value.toLowerCase()) || item.sku.toLowerCase().includes(event.target.value.toLowerCase());
     });
   }
 

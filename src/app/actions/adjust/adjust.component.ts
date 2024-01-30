@@ -64,7 +64,7 @@ export class AdjustComponent implements OnInit {
     this.showAddItem = false;
     this.showItemHeader = true;
     this.searchedItems = this.items.filter((item: Item) => {
-      return item.description.toLowerCase().includes(event.target.value.toLowerCase());
+      return item.description.toLowerCase().includes(event.target.value.toLowerCase()) || item.sku.toLowerCase().includes(event.target.value.toLowerCase());
     });
     this.searchedItems.forEach((item: Item) => {
       item.quantities = item.quantities?.sort((a: any, b: any) => {

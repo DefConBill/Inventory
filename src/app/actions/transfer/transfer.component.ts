@@ -67,7 +67,7 @@ export class TransferComponent implements OnInit {
     this.showAddItem = false;
     this.showItemHeader = true;
     this.searchedItems = this.items.filter((item: Item) => {
-      return item.description.toLowerCase().includes(event.target.value.toLowerCase());
+      return item.description.toLowerCase().includes(event.target.value.toLowerCase()) || item.sku.toLowerCase().includes(event.target.value.toLowerCase());
     });
     this.searchedItems.forEach((item: Item) => {
       item.quantities = item.quantities?.sort((a: any, b: any) => {
@@ -144,7 +144,7 @@ export class TransferComponent implements OnInit {
               user: this.user,
               type: 'Transfer',
               reference: "Transfer In",
-              location: this.fromLocation,
+              location: this.toLocation,
               quantity: item.quantity,
               item: item.itemId!,
             }
